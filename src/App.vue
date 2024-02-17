@@ -1,47 +1,70 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { reactive } from "vue";
+
+interface State {
+  // Defina o formato dos dados aqui
+  // Por exemplo:
+  valor1: number;
+  valor2: number;
+  filtro: string;
+}
+const estado = reactive<State>({
+  valor1: 0,
+  valor2: 0,
+  filtro: "somar",
+});
+
+function FazerConta(): number {
+  const { filtro, valor1, valor2 } = estado;
+
+  switch (filtro) {
+    case "subtrair":
+      return valor1 - valor2;
+    case "multiplicar":
+      return valor1 * valor2;
+    case "dividir":
+      return valor1 / valor2;
+    default:
+      return valor1 + valor2;
+  }
+}
+function alterarFiltro(e: Event) {
+  const target = e.target as HTMLInputElement;
+  estado.filtro = target.value;
+  FazerConta();
+}
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div class="container">
+    <h1 class="text-center p-5">Calculadora Aritmética</h1>
+    <div class="row">
+      <input
+        type="number"
+        class="col-md p-3 text-center me-5"
+        v-model="estado.valor1"
+        @keyup="FazerConta()"
+      />
+      <input
+        type="number"
+        class="col-md p-3 text-center me-5"
+        v-model="estado.valor2"
+        @keyup="FazerConta()"
+      />
+      <select class="col-md-2 p-3" @change="alterarFiltro($event)">
+        <option value="somar">Somar</option>
+        <option value="subtrair">Subtrair</option>
+        <option value="multiplicar">Multiplicar</option>
+        <option value="dividir">Dividir</option>
+      </select>
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <div class="row">
+      <h2 class="text-center mt-5" v-if="FazerConta() != 0">
+        O resultado da operação é <br /><b>{{ FazerConta().toFixed(2) }}</b>
+      </h2>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
 </style>
